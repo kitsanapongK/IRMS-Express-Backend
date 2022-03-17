@@ -7,6 +7,8 @@ const User = mongoose.model(
     uid : String,
     email : String,
     displayName: String,
+    role: String,
+    status: Boolean
 
   }).plugin(sanitizerPlugin)
 );

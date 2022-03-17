@@ -48,7 +48,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
 // routes
-require("./app/routes/user.routes")(app);
+require("./app/routes/auth.routes")(app);
 
 // redirect all other route to frontend
 app.get('*', function(req, res) {
