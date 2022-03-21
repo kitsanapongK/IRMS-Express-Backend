@@ -1,18 +1,21 @@
 const mongoose = require("mongoose");
 const sanitizerPlugin = require("mongoose-sanitizer-plugin");
 
-const Robot = mongoose.model(
-  "Robot",
+const RobotSchedule = mongoose.model(
+  "RobotSchedule",
   new mongoose.Schema({
-    ownerId: {
+    robotId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "robot",
+    },
+
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
     },
 
-    robotUid: String,
-    robotName: String,
-    lastOperationTime: Date,
+    scheduleType: String,
   }).plugin(sanitizerPlugin)
 );
 
-module.exports = Robot;
+module.exports = RobotSchedule;

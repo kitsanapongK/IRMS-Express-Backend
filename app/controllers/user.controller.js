@@ -1,90 +1,75 @@
-const db = require('../models');
-const moment = require('moment');
-const FormData = require('form-data');
+const db = require("../models");
 const User = db.user;
-const Robot = db.robot;
-const jwt = require("jsonwebtoken");
-const saltRounds = 10;
+const User_Detail = db.user_detail;
+const User_Setting = db.user_setting;
 
-// Firebase
-const admin = require("firebase-admin");
+const sanitize = require("mongo-sanitize");
+const { user } = require("../models");
 
-const sanitize = require('mongo-sanitize');
-
-exports.users_list = async (req, res) => {
-    try {
-        const usersResult = await admin.auth().listUsers(1000)
-        res.json(usersResult.users)
+exports.edit_user = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (user) {
+      const user_detail = await User_Detail.findById(user.userDetail);
+      if (req.body.firstName) {
+        user_detail.firstName = sanitize(req.body.firstName);
+      }
+      if (req.body.lastName) {
+        user_detail.lastName = sanitize(req.body.lastName);
+      }
+      if (req.files) {
+        user_detail.profileImage =
+          req.files.profileImage.data.toString("base64");
+      }
+      await user_detail.save();
+      return res.status(200).send(user_detail);
     }
-    catch (err) {
-        console.log(err)
-        res.status(500).send(err)
-    }
-}
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
 
 exports.user_detail = async (req, res) => {
-    try {
-        const user = await User.findById(req.userId)
-        res.status(200).send(user)
-    }
-    catch (err) {
-        console.log(err)
-        res.status(500).send(err)
-    }
-}
+  try {
+    const user = await User.findById(req.userId);
+    return res.status(200).send(user);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
 
-exports.generate_token = async (req, res) => {
-    try {
-        const user = await User.findOne({ uid: sanitize(req.body.uid) })
-        if (user) {
-            console.log("user exist")
-            let accesstoken = jwt.sign({id: user.id}, process.env.ACCESS_TOKEN_SECRET, {
-                expiresIn: process.env.ACCESS_TOKEN_LIFE
-            });
-            res.cookie('accessToken', accesstoken, {
-                maxAge: process.env.ACCESS_TOKEN_LIFE,
-                httpOnly: true,
-                secure: false,
-              });
-            res.status(200).send(user)
-        }
-        else {
-            console.log("user not exist")
-            const firebase_user = await admin.auth().getUser(req.body.uid)
-            const new_user = new User({
-                uid: firebase_user.uid,
-                email: firebase_user.email,
-                displayName: firebase_user.displayName,
-            });
-            await new_user.save()
-            res.status(200).send(new_user)
-        }
-        
-    }
-    catch (err) {
-        console.log(err)
-        res.status(500).send(err)
-    }
-}
+exports.user_setting_list = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    const user_setting = await User_Setting.find({ userId: user }).select(
+      "-userId"
+    );
+    return res.status(200).send(user_setting);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
 
-exports.create_user = async (req, res) => {
-    await bcrypt.hash(req.body.user.password,saltRounds,(err,hash)=>{
-        console.log(hash)
-   try {  
-        admin.auth().createUser(
-            {
-                email: req.body.user.email,
-                emailVerified: false,
-                phoneNumber:req.body.user.phone,
-                password:hash,
-                displayName:req.body.user.name,
-                disabled: false
-            })
-        res.json({message:'User Created'})
-   } 
-   catch (err) {
-        console.log(err)
-        res.status(500).send(err)
-   }
-  })
-}
+exports.edit_user_setting = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    const user_setting = await User_Setting.findById(req.body.settingId);
+    if (!user_setting) {
+      return res.status(404).send({ Message: "Setting not found" });
+    }
+    if (!user_setting.userId.equals(user.id)) {
+      return res
+        .status(403)
+        .send({ Message: "You don't have permission to edit this setting." });
+    }
+    user_setting.state = sanitize(req.body.state);
+    await user_setting.save();
+    return res.status(200).send({ Mesasge: "Success" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
