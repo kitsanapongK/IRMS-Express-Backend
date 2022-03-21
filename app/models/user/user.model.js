@@ -1,15 +1,19 @@
 const mongoose = require("mongoose");
-const sanitizerPlugin = require('mongoose-sanitizer-plugin');
+const sanitizerPlugin = require("mongoose-sanitizer-plugin");
 
 const User = mongoose.model(
   "User",
   new mongoose.Schema({
-    uid : String,
-    email : String,
+    userDetail: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user_detail",
+    },
+
+    uid: String,
+    email: String,
     displayName: String,
     role: String,
-    status: Boolean
-
+    status: Boolean,
   }).plugin(sanitizerPlugin)
 );
 
