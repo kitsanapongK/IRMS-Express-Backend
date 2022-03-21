@@ -32,7 +32,9 @@ exports.edit_user = async (req, res) => {
 
 exports.user_detail = async (req, res) => {
   try {
-    const user = await User.findById(req.userId);
+    const user = await User.findById(req.userId)
+      .select("userDetail")
+      .populate("userDetail");
     return res.status(200).send(user);
   } catch (err) {
     console.log(err);
