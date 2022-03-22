@@ -40,7 +40,7 @@ exports.update_image = async (req, res) => {
           req.files.profileImage.data.toString("base64");
       }
       await user_detail.save();
-      return res.status(200).send(user_detail);
+      return res.status(200).send(user_detail.profileImage);
     }
   } catch (err) {
     console.log(err);
