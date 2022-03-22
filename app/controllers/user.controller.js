@@ -30,6 +30,24 @@ exports.edit_user = async (req, res) => {
   }
 };
 
+exports.update_image = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (user) {
+      const user_detail = await User_Detail.findById(user.userDetail);
+      if (req.files) {
+        user_detail.profileImage =
+          req.files.profileImage.data.toString("base64");
+      }
+      await user_detail.save();
+      return res.status(200).send(user_detail);
+    }
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
+
 exports.user_detail = async (req, res) => {
   try {
     const user = await User.findById(req.userId)

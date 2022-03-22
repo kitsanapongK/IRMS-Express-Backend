@@ -15,6 +15,7 @@ module.exports = function (app) {
 
   router.get("/detail", [authJwt.verifyToken], userController.user_detail);
   router.post("/edit", [authJwt.verifyToken], userController.edit_user);
+  router.post("/image", [authJwt.verifyToken], userController.update_image);
   router.get(
     "/setting",
     [authJwt.verifyToken],
