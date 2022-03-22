@@ -25,10 +25,27 @@ exports.add_robot = async (req, res) => {
 
 exports.view_statistic = async (req, res) => {
   try {
-    const robot = await Robot.findOne({ key: sanitize(req.query.robotKey) });
+    const robot = await Robot.findOne({ key: sanitize(req.params.robotKey) });
     console.log(robot);
     const statistic_list = await Robot_Statistic.find({ robotId: robot.id });
     return res.status(200).send(statistic_list);
+  } catch (err) {
+    console.log(err);
+    return res.status(200).send(err);
+  }
+};
+
+exports.delete_statistic = async (req, res) => {
+  try {
+    const robot = await Robot.findOne({ key: sanitize(req.params.robotKey) });
+    const statistic = await Robot_Statistic.findById(
+      sanitize(req.body.statisticId)
+    );
+    if (!statistic) {
+      return res.status(404).send({ message: "record not found" });
+    }
+    await statistic.delete();
+    return res.status(200).send({ message: "record deleted" });
   } catch (err) {
     console.log(err);
     return res.status(200).send(err);

@@ -15,9 +15,14 @@ module.exports = function (app) {
 
   router.post("/add", authJwt.verifyToken, robotController.add_robot);
   router.get(
-    "/statistic/list",
+    "/:robotKey/statistic/list",
     authJwt.verifyToken,
     robotController.view_statistic
+  );
+  router.post(
+    "/:robotKey/statistic/delete",
+    authJwt.verifyToken,
+    robotController.delete_statistic
   );
 
   app.use("/apis/robot", router);
