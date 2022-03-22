@@ -6,12 +6,11 @@ const Robot = mongoose.model(
   new mongoose.Schema({
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "User",
     },
-
-    robotUid: String,
-    robotName: String,
-    lastOperationTime: Date,
+    displayName: String,
+    key: String,
+    lastOperationTime: { type: String, default: "" },
   }).plugin(sanitizerPlugin)
 );
 

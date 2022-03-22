@@ -1,18 +1,17 @@
 const mongoose = require("mongoose");
 const sanitizerPlugin = require("mongoose-sanitizer-plugin");
 
-const RobotNotification = mongoose.model(
-  "RobotNotification",
+const Robot_Notification = mongoose.model(
+  "Robot_Notification",
   new mongoose.Schema({
     robotId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "robot",
+      ref: "Robot",
     },
-
     message: String,
     userAcknowledge: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "User",
     },
 
     isView: Boolean,
@@ -20,4 +19,4 @@ const RobotNotification = mongoose.model(
   }).plugin(sanitizerPlugin)
 );
 
-module.exports = RobotNotification;
+module.exports = Robot_Notification;

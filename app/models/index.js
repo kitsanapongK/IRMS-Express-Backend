@@ -12,5 +12,6 @@ db.robot = require("./robot/robot.model");
 db.robot_nofitication = require("./robot/robotNotification.model");
 db.robot_schedule = require("./robot/robotSchedule.model");
 db.robot_setting = require("./robot/robotSetting.model");
+db.robot_statistic = require("./robot/robotStatistic.model");
 
 module.exports = db;

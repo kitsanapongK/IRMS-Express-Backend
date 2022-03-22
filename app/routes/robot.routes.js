@@ -1,3 +1,5 @@
+const { auth } = require("firebase-admin");
+
 module.exports = function (app) {
   const router = require("express").Router();
   const { authJwt } = require("../middlewares");
@@ -11,7 +13,12 @@ module.exports = function (app) {
     next();
   });
 
-  router.post("/add", robotController.add_robot);
+  router.post("/add", authJwt.verifyToken, robotController.add_robot);
+  router.get(
+    "/statistic/list",
+    authJwt.verifyToken,
+    robotController.view_statistic
+  );
 
   app.use("/apis/robot", router);
 };

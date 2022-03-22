@@ -6,7 +6,7 @@ const User_Detail = mongoose.model(
   new mongoose.Schema({
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "User",
     },
 
     firstName: String,

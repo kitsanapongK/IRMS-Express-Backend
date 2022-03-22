@@ -51,6 +51,7 @@ app.use(cookieParser());
 // routes
 require("./app/routes/auth.routes")(app);
 require("./app/routes/user.routes")(app);
+require("./app/routes/robot.routes")(app);
 
 // redirect all other route to frontend
 app.get("*", function (req, res) {

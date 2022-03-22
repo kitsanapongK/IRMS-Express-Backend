@@ -3,30 +3,34 @@ const moment = require("moment");
 const FormData = require("form-data");
 const User = db.user;
 const Robot = db.robot;
+const Robot_Statistic = db.robot_statistic;
 
 const sanitize = require("mongo-sanitize");
 
-exports.pair_robot = async (req, res) => {
+exports.add_robot = async (req, res) => {
   try {
-    const robot_key = req.body.robot_key;
-    const server_auth_token = req.body.server_auth_token;
-    const owner_id = req.body.owner_id;
-    new_robot = new Robot({
-      robotKey: sanitize(robot_key),
-      serverAuthToken: sanitize(server_auth_token),
-      ownerId: sanitize(owner_id),
+    const user = await User.findById(req.userId);
+    const new_robot = new Robot({
+      ownerId: user,
+      displayName: sanitize(req.body.displayName),
+      key: sanitize(req.body.key),
     });
     await new_robot.save();
+    return res.status(200).send({ message: "Robot added" });
   } catch (err) {
     console.log(err);
+    return res.status(200).send(err);
   }
 };
 
-exports.add_robot = async (req, res) => {
+exports.view_statistic = async (req, res) => {
   try {
-    const user = await User.findById(req.userId)
+    const robot = await Robot.findOne({ key: sanitize(req.query.robotKey) });
+    console.log(robot);
+    const statistic_list = await Robot_Statistic.find({ robotId: robot.id });
+    return res.status(200).send(statistic_list);
+  } catch (err) {
+    console.log(err);
+    return res.status(200).send(err);
   }
-  catch (err) {
-
-  }
-}
+};
