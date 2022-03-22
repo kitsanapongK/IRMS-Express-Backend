@@ -14,6 +14,22 @@ module.exports = function (app) {
   });
 
   router.post("/add", authJwt.verifyToken, robotController.add_robot);
+  router.get("/:robotKey", authJwt.verifyToken, robotController.robot_detail);
+  router.post(
+    "/:robotKey/edit",
+    authJwt.verifyToken,
+    robotController.edit_robot
+  );
+  router.post(
+    "/:robotKey/delete",
+    authJwt.verifyToken,
+    robotController.delete_robot
+  );
+  router.get(
+    "/:robotKey/statistic",
+    authJwt.verifyToken,
+    robotController.statistic_summary
+  );
   router.get(
     "/:robotKey/statistic/list",
     authJwt.verifyToken,

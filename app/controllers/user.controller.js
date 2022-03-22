@@ -1,10 +1,8 @@
 const db = require("../models");
+const sanitize = require("mongo-sanitize");
 const User = db.user;
 const User_Detail = db.user_detail;
 const User_Setting = db.user_setting;
-
-const sanitize = require("mongo-sanitize");
-const { user } = require("../models");
 
 exports.edit_user = async (req, res) => {
   try {
