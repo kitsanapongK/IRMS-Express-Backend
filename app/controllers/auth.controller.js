@@ -7,6 +7,8 @@ const path = require("path");
 const handlebars = require("handlebars");
 const mailer = require("nodemailer");
 
+const profileImage = require("../assets/profileImage.json"); 
+
 // Database Collection
 const User = db.user;
 const User_Detail = db.user_detail;
@@ -69,7 +71,7 @@ exports.signin = async (req, res) => {
         userId: new_user,
         firstName: "",
         lastName: "",
-        profileImage: "Default",
+        profileImage: profileImage.value,
       });
       await user_detail.save();
       new_user.userDetail = user_detail;
@@ -108,7 +110,7 @@ exports.sign_up = async (req, res) => {
       userId: new_user,
       firstName: sanitize(req.body.firstName),
       lastName: sanitize(req.body.lastName),
-      profileImage: "Default",
+      profileImage: profileImage.value,
     });
     await user_detail.save();
     new_user.userDetail = user_detail;
@@ -128,7 +130,7 @@ exports.sign_up = async (req, res) => {
     let template = handlebars.compile(email_html);
     let replacements = {
       emailUrl: process.env.EMAIL_DOMAIN,
-      verifyLink: process.env.EMAIL_DOMAIN + "/signup/verify/" + token,
+      verifyLink: process.env.EMAIL_DOMAIN + "/app/signup/verify/" + token,
     };
     let complete_html = template(replacements);
     const msg = {
@@ -137,17 +139,17 @@ exports.sign_up = async (req, res) => {
       subject: "[IRMS] Verify Email",
       html: complete_html,
     };
-    // smtpTransport.sendMail(msg, function(err, response){
-    //     smtpTransport.close();
-    //     if (err){
+    smtpTransport.sendMail(msg, function(err, response){
+        smtpTransport.close();
+        if (err){
 
-    //         return res.status(500).send({message: "internal server error"});
-    //     }
-    //     else {
-    //         // return res.status(200).send({ status: "Transfer request created"})
-    //         return res.status(200).send({ verifyLink: token });
-    //     }
-    // });
+            return res.status(500).send({message: "internal server error"});
+        }
+        else {
+            // return res.status(200).send({ status: "Transfer request created"})
+            return res.status(200).send({ verifyLink: token });
+        }
+    });
     return res.status(200).send({
       message:
         "An email was sent to " +
@@ -200,7 +202,7 @@ exports.generate_forgot_pwd_email = async (req, res) => {
       expiresIn: process.env.RESET_PWD_TOKEN_LIFE,
     });
     const email_html = fs.readFileSync(
-      path.join(__dirname, "../assets/fromEmail/register/index.html"),
+      path.join(__dirname, "../assets/fromEmail/forgotpwd/index.html"),
       "utf8"
     );
     let template = handlebars.compile(email_html);

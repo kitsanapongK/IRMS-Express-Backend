@@ -11,7 +11,7 @@ const User_Detail = mongoose.model(
 
     firstName: String,
     lastName: String,
-    profileImage: String,
+    profileImage: {type: String, default: ""},
   }).plugin(sanitizerPlugin)
 );
 
