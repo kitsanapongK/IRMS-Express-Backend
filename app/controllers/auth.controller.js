@@ -219,7 +219,13 @@ exports.generate_forgot_pwd_email = async (req, res) => {
     //         return res.status(200).send({ message: "If a matching account was found an email was sent to " + req.body.email + " to allow you to reset your password"})
     //     }
     // });
-    return res.status(200).send({ verifyLink: token });
+    //return res.status(200).send({ verifyLink: token });
+    return res.status(200).send({
+      message:
+        "If a matching account was found an email was sent to " +
+        req.body.email +
+        " to allow you to reset your password",
+    });
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
