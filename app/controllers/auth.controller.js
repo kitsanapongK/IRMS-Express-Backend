@@ -148,7 +148,13 @@ exports.sign_up = async (req, res) => {
     //         return res.status(200).send({ verifyLink: token });
     //     }
     // });
-    return res.status(200).send({ verifyLink: token });
+    return res.status(200).send({
+      message:
+        "An email was sent to " +
+        req.body.email +
+        ". Please check your inbox to verify your account",
+      verifyLink: token,
+    });
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
@@ -200,7 +206,8 @@ exports.generate_forgot_pwd_email = async (req, res) => {
     let template = handlebars.compile(email_html);
     let replacements = {
       emailUrl: process.env.EMAIL_DOMAIN,
-      verifyLink: process.env.EMAIL_DOMAIN + "/reset-pwd/verify/" + token,
+      verifyLink:
+        process.env.EMAIL_DOMAIN + "/app/auth/reset-password/" + token,
     };
     let complete_html = template(replacements);
     const msg = {
@@ -209,17 +216,27 @@ exports.generate_forgot_pwd_email = async (req, res) => {
       subject: "[IRMS] Reset Password",
       html: complete_html,
     };
-    // smtpTransport.sendMail(msg, function(err, response){
-    //     smtpTransport.close();
-    //     if (err){
-    //         return res.status(500).send({message: "internal server error"});
-    //     }
-    //     else {
-    //         // return res.status(200).send({ status: "Transfer request created"})
-    //         return res.status(200).send({ message: "If a matching account was found an email was sent to " + req.body.email + " to allow you to reset your password"})
-    //     }
-    // });
-    return res.status(200).send({ verifyLink: token });
+    smtpTransport.sendMail(msg, function (err, response) {
+      smtpTransport.close();
+      if (err) {
+        return res.status(500).send({ message: "internal server error" });
+      } else {
+        // return res.status(200).send({ status: "Transfer request created"})
+        return res.status(200).send({
+          message:
+            "If a matching account was found an email was sent to " +
+            req.body.email +
+            " to allow you to reset your password",
+        });
+      }
+    });
+    return res.status(200).send({
+      message:
+        "If a matching account was found an email was sent to " +
+        req.body.email +
+        " to allow you to reset your password",
+      verifyLink: token,
+    });
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
