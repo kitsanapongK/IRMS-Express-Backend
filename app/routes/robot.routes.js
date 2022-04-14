@@ -30,6 +30,7 @@ module.exports = function (app) {
     authJwt.verifyToken,
     robotController.statistic_summary
   );
+  router.post("/:robotKey/statistic/create", robotController.save_statistic);
   router.get(
     "/:robotKey/statistic/list",
     authJwt.verifyToken,
@@ -39,6 +40,11 @@ module.exports = function (app) {
     "/:robotKey/statistic/delete",
     authJwt.verifyToken,
     robotController.delete_statistic
+  );
+  router.get(
+    "/:robotKey/video/list",
+    authJwt.verifyToken,
+    robotController.view_video
   );
 
   app.use("/apis/robot", router);

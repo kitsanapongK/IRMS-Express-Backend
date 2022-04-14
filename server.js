@@ -66,7 +66,12 @@ server = app.listen(port, () => console.log("server running on port " + port));
 db.mongoose
   .connect(process.env.DB)
   .then(() => {
-    console.log("Successfully connect to MongoDB.");
+    new db.mongoose.mongo.Admin(db.mongoose.connection.db).buildInfo(function (
+      err,
+      info
+    ) {
+      console.log("Successfully connect to MongoDB version " + info.version);
+    });
   })
   .catch((err) => {
     console.error("Connection error", err);

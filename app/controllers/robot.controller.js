@@ -1,8 +1,10 @@
 const db = require("../models");
+const moment = require("moment");
 const sanitize = require("mongo-sanitize");
 const User = db.user;
 const Robot = db.robot;
 const Robot_Statistic = db.robot_statistic;
+const Robot_Video = db.robot_video;
 
 exports.add_robot = async (req, res) => {
   try {
@@ -113,8 +115,8 @@ exports.statistic_summary = async (req, res) => {
       { $match: { robotId: { $in: [robot._id] } } },
       {
         $addFields: {
-          duration: {
-            $divide: [{ $subtract: ["$timeStop", "$timeStart"] }, 3600000],
+          durationTotal: {
+            $divide: [{ $subtract: ["$timeStop", "$timeStart"] }, 60000],
           },
         },
       },
@@ -122,12 +124,46 @@ exports.statistic_summary = async (req, res) => {
         $group: {
           _id: { robotId: "$robotId" },
           sumOfTotalDistance: { $sum: "$totalDistance" },
-          sumOfTotalTime: { $sum: "$duration" },
+          sumOfTotalTime: { $sum: "$durationTotal" },
           count: { $sum: 1 },
         },
       },
     ]);
     return res.status(200).send(statistic_summary);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
+
+exports.save_statistic = async (req, res) => {
+  try {
+    const robot = await Robot.findOne({ key: sanitize(req.params.robotKey) });
+    if (!robot) {
+      return res.status(404).send();
+    }
+    await new Robot_Statistic({
+      robotId: robot,
+      timeStart: moment(req.body.startTime, "HH:mm:ss"),
+      timeStop: moment(req.body.stopTime, "HH:mm:ss"),
+      duration: req.body.duration,
+      totalDistance: req.body.dist,
+    }).save();
+    robot.lastOperationTime = req.body.duration;
+    await robot.save();
+    return res.status(200).send();
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send();
+  }
+};
+
+exports.view_video = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    const robot = await Robot.findOne({ key: sanitize(req.params.robotKey) });
+    const video_list = await Robot_Video.find({ robotId: robot.id });
+    return res.status(200).send(video_list);
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
