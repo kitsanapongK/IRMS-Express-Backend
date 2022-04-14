@@ -116,7 +116,7 @@ exports.statistic_summary = async (req, res) => {
       {
         $addFields: {
           durationTotal: {
-            $divide: [{ $subtract: ["$timeStop", "$timeStart"] }, 60000],
+            $divide: [{ $subtract: ["$timeStop", "$timeStart"] }, 1000],
           },
         },
       },
@@ -168,4 +168,30 @@ exports.view_video = async (req, res) => {
     console.log(err);
     return res.status(500).send(err);
   }
+};
+
+exports.delete_video = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    const robot = await Robot.findOne({ key: sanitize(req.params.robotKey) });
+    const video = await Robot_Video.findById(sanitize(req.body.videoId));
+    if (!video) {
+      return res.status(404).send({ message: "record not found" });
+    }
+    if (!video.robotId.equals(robot.id) || !robot.ownerId.equals(user.id)) {
+      return res
+        .status(403)
+        .send({ Message: "You don't have permission to edit this record." });
+    }
+    await video.delete();
+    return res.status(200).send({ message: "record deleted" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
+
+exports.schedule_list = async (req, res) => {
+  try {
+  } catch (err) {}
 };
