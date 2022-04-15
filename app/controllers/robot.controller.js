@@ -196,7 +196,9 @@ exports.view_schedule = async (req, res) => {
   try {
     const user = await User.findById(req.userId);
     const robot = await Robot.findOne({ key: sanitize(req.params.robotKey) });
-    const schedule_list = await Robot_Schedule.find({ robotId: robot.id });
+    const schedule_list = await Robot_Schedule.find({ robotId: robot.id }).sort(
+      { hour: 1, minute: 1 }
+    );
     return res.status(200).send(schedule_list);
   } catch (err) {
     console.log(err);
