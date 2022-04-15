@@ -5,6 +5,7 @@ const User = db.user;
 const Robot = db.robot;
 const Robot_Statistic = db.robot_statistic;
 const Robot_Video = db.robot_video;
+const Robot_Schedule = db.robot_schedule;
 
 exports.add_robot = async (req, res) => {
   try {
@@ -191,7 +192,61 @@ exports.delete_video = async (req, res) => {
   }
 };
 
-exports.schedule_list = async (req, res) => {
+exports.view_schedule = async (req, res) => {
   try {
-  } catch (err) {}
+    const user = await User.findById(req.userId);
+    const robot = await Robot.findOne({ key: sanitize(req.params.robotKey) });
+    const schedule_list = await Robot_Schedule.find({ robotId: robot.id });
+    return res.status(200).send(schedule_list);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
+
+exports.create_schedule = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    const robot = await Robot.findOne({ key: sanitize(req.params.robotKey) });
+    if (!robot) {
+      return res.status(404).send();
+    }
+    await new Robot_Schedule({
+      robotId: robot,
+      userId: user,
+      activate: req.body.activate,
+      name: req.body.name,
+      hour: req.body.hour,
+      minute: req.body.minute,
+      interval: req.body.interval,
+      daySelected: JSON.parse(req.body.daySelected),
+    }).save();
+    return res.status(200).send({ message: "Schedule created" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send();
+  }
+};
+
+exports.delete_schedule = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    const robot = await Robot.findOne({ key: sanitize(req.params.robotKey) });
+    const schedule = await Robot_Schedule.findById(
+      sanitize(req.body.scheduleId)
+    );
+    if (!schedule) {
+      return res.status(404).send({ message: "record not found" });
+    }
+    if (!schedule.robotId.equals(robot.id) || !robot.ownerId.equals(user.id)) {
+      return res
+        .status(403)
+        .send({ Message: "You don't have permission to edit this record." });
+    }
+    await schedule.delete();
+    return res.status(200).send({ message: "record deleted" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
 };

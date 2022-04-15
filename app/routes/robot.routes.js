@@ -51,6 +51,21 @@ module.exports = function (app) {
     authJwt.verifyToken,
     robotController.delete_video
   );
+  router.get(
+    "/:robotKey/schedule/list",
+    authJwt.verifyToken,
+    robotController.view_schedule
+  );
+  router.post(
+    "/:robotKey/schedule/create",
+    authJwt.verifyToken,
+    robotController.create_schedule
+  );
+  router.post(
+    "/:robotKey/schedule/delete",
+    authJwt.verifyToken,
+    robotController.delete_schedule
+  );
 
   app.use("/apis/robot", router);
 };

@@ -12,8 +12,12 @@ const Robot_Schedule = mongoose.model(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-
-    scheduleType: String,
+    activate: Boolean,
+    name: String,
+    hour: Number,
+    minute: Number,
+    interval: String,
+    daySelected: Object,
   }).plugin(sanitizerPlugin)
 );
 
