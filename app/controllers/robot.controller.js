@@ -208,6 +208,7 @@ exports.view_schedule = async (req, res) => {
 
 exports.create_schedule = async (req, res) => {
   try {
+    console.log(req.body.daySelected)
     const user = await User.findById(req.userId);
     const robot = await Robot.findOne({ key: sanitize(req.params.robotKey) });
     if (!robot) {
@@ -221,9 +222,12 @@ exports.create_schedule = async (req, res) => {
       hour: req.body.hour,
       minute: req.body.minute,
       interval: req.body.interval,
-      daySelected: JSON.parse(req.body.daySelected),
+      daySelected: req.body.daySelected,
     }).save();
-    return res.status(200).send({ message: "Schedule created" });
+    const schedule_list = await Robot_Schedule.find({ robotId: robot.id }).sort(
+      { hour: 1, minute: 1 }
+    );
+    return res.status(200).send(schedule_list);
   } catch (err) {
     console.log(err);
     return res.status(500).send();
