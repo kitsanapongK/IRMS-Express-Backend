@@ -252,3 +252,27 @@ exports.delete_schedule = async (req, res) => {
     return res.status(500).send(err);
   }
 };
+
+exports.toggle_schedule = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    const robot = await Robot.findOne({ key: sanitize(req.params.robotKey) });
+    const schedule = await Robot_Schedule.findById(
+      sanitize(req.body.scheduleId)
+    );
+    if (!schedule) {
+      return res.status(404).send({ message: "record not found" });
+    }
+    if (!schedule.robotId.equals(robot.id) || !robot.ownerId.equals(user.id)) {
+      return res
+        .status(403)
+        .send({ Message: "You don't have permission to edit this record." });
+    }
+    schedule.activate = req.body.activate;
+    await schedule.save();
+    return res.status(200).send({ state: schedule.activate });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};

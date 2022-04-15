@@ -62,6 +62,11 @@ module.exports = function (app) {
     robotController.create_schedule
   );
   router.post(
+    "/:robotKey/schedule/toggle",
+    authJwt.verifyToken,
+    robotController.toggle_schedule
+  );
+  router.post(
     "/:robotKey/schedule/delete",
     authJwt.verifyToken,
     robotController.delete_schedule
